@@ -9,6 +9,7 @@ export default function NoteEditor({
 }) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [showFolderAlert, setShowFolderAlert] = useState(false);
 
   useEffect(() => {
     if (currentNote) {
@@ -23,6 +24,14 @@ export default function NoteEditor({
   const handleSave = () => {
     if (!title.trim()) return;
     
+    // Check if folder is selected when creating a new note
+    if (!currentNote && !currentFolder) {
+      setShowFolderAlert(true);
+      return;
+    }
+    
+    setShowFolderAlert(false);
+    
     const allNotes = getNotes();
     let updatedNotes = [];
     
@@ -31,7 +40,7 @@ export default function NoteEditor({
       updatedNotes = allNotes.map(note => 
         note.id === currentNote.id ? { ...note, title, content } : note
       );
-    } else if (currentFolder) {
+    } else {
       // Create new note
       const newNote = {
         id: Date.now().toString(),
@@ -73,6 +82,13 @@ export default function NoteEditor({
           </button>
         </div>
       </div>
+      
+      {showFolderAlert && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-200">
+          Please select a folder before saving the note.
+        </div>
+      )}
+      
       <input
         type="text"
         value={title}
